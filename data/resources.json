@@ -1,0 +1,233 @@
+[
+  {
+    "name": "MITRE ATT&CK Navigator",
+    "description": "Layer and annotate the ATT&CK matrix to map detection coverage against the techniques your sector actually faces.",
+    "category": "analyst-tools",
+    "url": "https://attack.mitre.org/navigator/",
+    "tags": ["mitre", "coverage", "mapping"]
+  },
+  {
+    "name": "CyberChef",
+    "description": "The cyber swiss army knife — encode, decode, decompress, extract and transform data in the browser without touching a shell.",
+    "category": "analyst-tools",
+    "url": "https://gchq.github.io/CyberChef/",
+    "tags": ["encoding", "transform", "web"]
+  },
+  {
+    "name": "Elastic Security / Kibana",
+    "description": "Open detection engineering stack with prebuilt rules, timeline investigation and endpoint telemetry in one place.",
+    "category": "analyst-tools",
+    "url": "https://www.elastic.co/security",
+    "tags": ["siem", "edr", "open-source"]
+  },
+  {
+    "name": "VirusTotal",
+    "description": "Multi-engine file and URL scanning with behaviour graphs. Use the original hash, not the redirect, when enriching IOCs.",
+    "category": "analyst-tools",
+    "url": "https://www.virustotal.com/",
+    "tags": ["enrichment", "sandbox"]
+  },
+  {
+    "name": "MISP / OpenCTI",
+    "description": "Threat intelligence platforms for sharing, correlating and exporting indicators with your partners.",
+    "category": "analyst-tools",
+    "url": "https://www.misp-project.org/",
+    "tags": ["cti", "sharing", "stix"]
+  },
+  {
+    "name": "LOLBAS Project",
+    "description": "Living off the Land Binaries and Scripts — the definitive catalogue of dual-use Windows binaries with usage examples.",
+    "category": "lolbins",
+    "url": "https://lolbas-project.github.io/",
+    "tags": ["windows", "lolbin", "detection"]
+  },
+  {
+    "name": "GTFOBins",
+    "description": "Unix equivalents: how common binaries can be abused for privilege escalation, shell escapes and file read/write.",
+    "category": "lolbins",
+    "url": "https://gtfobins.github.io/",
+    "tags": ["linux", "privesc"]
+  },
+  {
+    "name": "LOLRuckets",
+    "description": "Runtime packer catalog for binaries that are legitimately packed — reduces false positives in static analysis.",
+    "category": "lolbins",
+    "url": "https://github.com/cptactionhank/LOLRuckets",
+    "tags": ["packing", "pe"]
+  },
+  {
+    "name": "Wazuh",
+    "description": "Open-source XDR/SIEM with file integrity monitoring, log collection and built-in detection rules.",
+    "category": "siem",
+    "url": "https://wazuh.com/",
+    "tags": ["open-source", "xdr", "fim"]
+  },
+  {
+    "name": "Microsoft Sentinel",
+    "description": "Cloud-native SIEM with KQL analytics, fusion correlation and a large community rule ecosystem.",
+    "category": "siem",
+    "url": "https://azure.microsoft.com/products/microsoft-sentinel/",
+    "tags": ["azure", "kql", "cloud"]
+  },
+  {
+    "name": "Splunk Enterprise Security",
+    "description": "Correlation search framework that made risk-based alerting mainstream — home of the SPL hunting tradition.",
+    "category": "siem",
+    "url": "https://www.splunk.com/en_us/products/enterprise-security.html",
+    "tags": ["spl", "enterprise"]
+  },
+  {
+    "name": "Sigma Rules Repository",
+    "description": "Thousands of portable detection rules you can convert to your SIEM's language — start here before writing your own.",
+    "category": "siem",
+    "url": "https://github.com/SigmaHQ/sigma",
+    "tags": ["sigma", "detection-as-code"]
+  },
+  {
+    "name": "Wireshark",
+    "description": "The packet analysis standard: dissect, filter and follow streams across hundreds of protocols.",
+    "category": "packet-analysis",
+    "url": "https://www.wireshark.org/",
+    "tags": ["pcap", "network", "dissection"]
+  },
+  {
+    "name": "Zeek",
+    "description": "Network monitoring framework that turns traffic into structured logs (conn, dns, http, ssl) ideal for hunting.",
+    "category": "packet-analysis",
+    "url": "https://zeek.org/",
+    "tags": ["nids", "logging"]
+  },
+  {
+    "name": "NetworkMiner",
+    "description": "Forensic PCAP viewer that extracts files, images and credentials straight out of capture files.",
+    "category": "packet-analysis",
+    "url": "https://www.netresec.com/?page=NetworkMiner",
+    "tags": ["forensics", "pcap"]
+  },
+  {
+    "name": "tcpdump / tshark CLI",
+    "description": "Scriptable capture and filtering for responders who need answers without a GUI on the box.",
+    "category": "packet-analysis",
+    "url": "https://www.wireshark.org/docs/man-pages/tshark.html",
+    "tags": ["cli", "capture"]
+  },
+  {
+    "name": "OSCP — Offensive Security",
+    "description": "Hands-on penetration testing certification. Still the most respected practical entry ticket for red teamers.",
+    "category": "certifications",
+    "url": "https://www.offsec.com/courses/pen-200/",
+    "tags": ["pentest", "offensive"]
+  },
+  {
+    "name": "GCFA — GIAC Forensic Analyst",
+    "description": "Digital forensics and incident response certification covering disk, memory and Windows artefact analysis.",
+    "category": "certifications",
+    "url": "https://www.giac.org/certifications/forensic-analyst-gcfa",
+    "tags": ["dfir", "forensics"]
+  },
+  {
+    "name": "GNFA — GIAC Network Forensic Analyst",
+    "description": "Network-focused forensics: PCAP analysis, protocol reconstruction and lateral movement tracing.",
+    "category": "certifications",
+    "url": "https://www.giac.org/certifications/network-forensic-analyst-gnfa",
+    "tags": ["network", "forensics"]
+  },
+  {
+    "name": "BTL1 — Blue Team Level 1",
+    "description": "Practical blue team foundation: SIEM, forensics, threat hunting and incident response in one lab-heavy course.",
+    "category": "certifications",
+    "url": "https://www.securityblue.team/",
+    "tags": ["blue-team", "entry"]
+  },
+  {
+    "name": "CRTO — Red Team Ops",
+    "description": "Cobalt Strike and adversary emulation focused certification with a strong defensive-read audience too.",
+    "category": "certifications",
+    "url": "https://www.zero-pointsecurity.co.uk/",
+    "tags": ["red-team", "adversary-simulation"]
+  },
+  {
+    "name": "Project KillChain VAPT Format",
+    "description": "The community reporting template this Hub's Report Builder implements — scope, findings, CVSS and remediation.",
+    "category": "reporting",
+    "url": "https://github.com/CyDefOps/project-killchain",
+    "tags": ["vapt", "template"]
+  },
+  {
+    "name": "Pentester's Report Checklist",
+    "description": "A short list of what turns a findings dump into something an engineering team will actually fix.",
+    "category": "reporting",
+    "url": "https://owasp.org/www-project-web-security-testing-guide/",
+    "tags": ["writing", "owasp"]
+  },
+  {
+    "name": "Shodan",
+    "description": "Search engine for internet-exposed devices — see what the outside world sees before an attacker does.",
+    "category": "osint",
+    "url": "https://www.shodan.io/",
+    "tags": ["recon", "exposure"]
+  },
+  {
+    "name": "Censys",
+    "description": "Certificate and host intelligence for attack surface management and historical exposure tracking.",
+    "category": "osint",
+    "url": "https://censys.io/",
+    "tags": ["recon", "certificates"]
+  },
+  {
+    "name": "AbuseIPDB",
+    "description": "Community-sourced IP reputation for fast triage of inbound sources. Correlate with your own logs before blocking.",
+    "category": "osint",
+    "url": "https://www.abuseipdb.com/",
+    "tags": ["ip", "reputation"]
+  },
+  {
+    "name": "Kali Linux",
+    "description": "The best-known offensive security distribution — full toolchain for assessments and lab work.",
+    "category": "analyst-tools",
+    "url": "https://www.kali.org/",
+    "tags": ["os", "offensive"]
+  },
+  {
+    "name": "REMnux",
+    "description": "Linux distro for reverse engineering and malware analysis — tuned for detonating and inspecting samples safely.",
+    "category": "analyst-tools",
+    "url": "https://remnux.org/",
+    "tags": ["malware", "reversing", "os"]
+  },
+  {
+    "name": "Flare-VM",
+    "description": "Windows toolkit distribution for reverse engineering: debuggers, disassemblers and analysis utilities preinstalled.",
+    "category": "analyst-tools",
+    "url": "https://github.com/mandiant/flare-vm",
+    "tags": ["windows", "reversing", "os"]
+  },
+  {
+    "name": "C2 Matrix",
+    "description": "Comparison matrix of command-and-control frameworks — reference only, for detecting their default artefacts.",
+    "category": "c2-reference",
+    "url": "https://www.thec2matrix.com/",
+    "tags": ["c2", "detection", "reference"]
+  },
+  {
+    "name": "Atomic Red Team",
+    "description": "Small, scripted attack simulations mapped to ATT&CK — the fastest way to test whether a detection works.",
+    "category": "c2-reference",
+    "url": "https://github.com/redcanaryco/atomic-red-team",
+    "tags": ["purple-team", "validation"]
+  },
+  {
+    "name": "Caldera",
+    "description": "MITRE's automated adversary emulation platform for repeatable purple team exercises.",
+    "category": "c2-reference",
+    "url": "https://github.com/mitre/caldera",
+    "tags": ["purple-team", "automation"]
+  },
+  {
+    "name": "Metasploit Unleashed Notes",
+    "description": "Community courseware documenting exploitation concepts so defenders know exactly what artefacts to hunt.",
+    "category": "c2-reference",
+    "url": "https://www.offsec.com/metasploit-unleashed/",
+    "tags": ["offensive", "education"]
+  }
+]

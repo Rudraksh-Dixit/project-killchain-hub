@@ -1,0 +1,202 @@
+[
+  {
+    "name": "Header Sentinel",
+    "description": "Audits HTTP security headers (CSP, HSTS, X-Frame-Options, Referrer-Policy and friends) on one URL or a list, and prints a scored report.",
+    "category": "web-security",
+    "language": "python",
+    "scriptPath": "/scripts/header_checker.py",
+    "usage": "python header_checker.py https://example.org --json",
+    "tags": ["headers", "csp", "hsts", "audit"],
+    "stars": 128
+  },
+  {
+    "name": "FavBuster",
+    "description": "Extracts and fingerprints favicons from a target list — useful for tracking phishing kits that reuse the same asset hash.",
+    "category": "web-security",
+    "language": "python",
+    "scriptPath": "",
+    "usage": "python favbuster.py -l targets.txt --hash",
+    "tags": ["favicon", "phishing", "recon"],
+    "stars": 74
+  },
+  {
+    "name": "LazyDNS",
+    "description": "Passive DNS record dumper for a domain: A, AAAA, MX, NS, TXT and CNAME with batch output for IOC enrichment.",
+    "category": "web-security",
+    "language": "python",
+    "scriptPath": "",
+    "usage": "python lazydns.py example.org -o records.json",
+    "tags": ["dns", "recon", "enrichment"],
+    "stars": 96
+  },
+  {
+    "name": "Cookie Secure Auditor",
+    "description": "Checks session cookie flags (Secure, HttpOnly, SameSite, expiry) across authenticated and unauthenticated responses.",
+    "category": "web-security",
+    "language": "python",
+    "scriptPath": "",
+    "usage": "python cookie_auditor.py https://example.org/login",
+    "tags": ["cookies", "session", "web"],
+    "stars": 52
+  },
+  {
+    "name": "ADS Tracer",
+    "description": "Enumerates alternate data streams on a directory tree and flags unexpected streams on executables — a classic NTFS hiding spot.",
+    "category": "windows",
+    "language": "powershell",
+    "scriptPath": "",
+    "usage": ".\\ads-tracer.ps1 -Path C:\\Users -Recurse",
+    "tags": ["ntfs", "ads", "forensics"],
+    "stars": 61
+  },
+  {
+    "name": "Event Log Snapshot",
+    "description": "One-shot collector that exports Security, PowerShell and Sysmon logs plus a running process list into a triage folder.",
+    "category": "windows",
+    "language": "powershell",
+    "scriptPath": "",
+    "usage": ".\\event-snapshot.ps1 -Out C:\\triage\\host01",
+    "tags": ["dfir", "triage", "collector"],
+    "stars": 143
+  },
+  {
+    "name": "Service Shadow",
+    "description": "Dumps every Windows service with its binary path, account and start type, highlighting paths in user-writable folders.",
+    "category": "windows",
+    "language": "powershell",
+    "scriptPath": "",
+    "usage": ".\\service-shadow.ps1 | Where-Object { $_.Writable }",
+    "tags": ["persistence", "services", "audit"],
+    "stars": 58
+  },
+  {
+    "name": "Signin Anomaly Pack",
+    "description": "Ten ready-to-paste KQL queries for impossible travel, legacy auth, risky device and unfamiliar-location reviews.",
+    "category": "azure-kql",
+    "language": "kql",
+    "scriptPath": "",
+    "usage": "// paste into Microsoft Sentinel / Log Analytics\nSigninLogs | where ResultType != 0 | summarize count() by UserPrincipalName",
+    "tags": ["entra", "kql", "identity"],
+    "stars": 187
+  },
+  {
+    "name": "Entra Lockout Analyzer",
+    "description": "Correlates 4740 lockouts with the source workstation and preceding 4625 failures to find the spraying host.",
+    "category": "azure-kql",
+    "language": "kql",
+    "scriptPath": "",
+    "usage": "IdentityLogonEvents\n| where ActionType has \"lockout\"",
+    "tags": ["lockout", "spray", "entra"],
+    "stars": 91
+  },
+  {
+    "name": "Sentinel Fusion Starter",
+    "description": "Starter fusion rules chaining suspicious sign-in + mail forwarding + inbox rule creation into a single incident.",
+    "category": "azure-kql",
+    "language": "kql",
+    "scriptPath": "",
+    "usage": "// requires Analytics rules 1, 4 and 7 enabled as fusion sources",
+    "tags": ["sentinel", "fusion", "automation"],
+    "stars": 77
+  },
+  {
+    "name": "WhatThePhish",
+    "description": "Full phishing triage pipeline: header parse, link defang, redirect chain walk and lookalike-domain scoring.",
+    "category": "phishing-analysis",
+    "language": "python",
+    "scriptPath": "",
+    "usage": "python whatthephish.py --eml sample.eml --walk-links",
+    "tags": ["phishing", "headers", "triage"],
+    "stars": 214
+  },
+  {
+    "name": "Header Forensics",
+    "description": "Parses Received, Authentication-Results and ARC headers to reconstruct the true origin of a spoofed message.",
+    "category": "phishing-analysis",
+    "language": "python",
+    "scriptPath": "",
+    "usage": "python header_forensics.py message.eml --json",
+    "tags": ["email", "spf", "dkim", "dmarc"],
+    "stars": 132
+  },
+  {
+    "name": "Defang / Refang Toolkit",
+    "description": "One-click defanger for indicators in reports: converts hxxp, [.] and (.) forms back and forth safely for chat and tickets.",
+    "category": "phishing-analysis",
+    "language": "python",
+    "scriptPath": "/scripts/defang.py",
+    "usage": "python defang.py --mode defang 'https://example.org/login'",
+    "tags": ["defang", "reporting", "safety"],
+    "stars": 168
+  },
+  {
+    "name": "Attachment Triage",
+    "description": "Safely unpacks password-protected archives from mail, computes hashes and extracts embedded URLs without executing anything.",
+    "category": "phishing-analysis",
+    "language": "python",
+    "scriptPath": "",
+    "usage": "python attachment_triage.py inbox/ --password-infected",
+    "tags": ["attachments", "archive", "dfir"],
+    "stars": 89
+  },
+  {
+    "name": "PE Entropy Scanner",
+    "description": "Walks a folder of binaries, plots section entropy and flags packers or overlay blobs typical of loaders.",
+    "category": "reverse-engineering",
+    "language": "python",
+    "scriptPath": "",
+    "usage": "python pe_entropy.py samples/ --threshold 7.2",
+    "tags": ["pe", "entropy", "packing"],
+    "stars": 118
+  },
+  {
+    "name": "String Seeder",
+    "description": "Extracts printable strings with IOC-shaped hits (IPv4, domains, URLs, hashes) highlighted and deduplicated.",
+    "category": "reverse-engineering",
+    "language": "python",
+    "scriptPath": "",
+    "usage": "python string_seeder.py binary.exe --ioc-highlight",
+    "tags": ["strings", "ioc", "static"],
+    "stars": 105
+  },
+  {
+    "name": "Import Table Viewer",
+    "description": "Dumps PE import tables and flags unusual API combinations (keylogging, injection, anti-analysis) as a first-pass read.",
+    "category": "reverse-engineering",
+    "language": "python",
+    "scriptPath": "",
+    "usage": "python imports_viewer.py suspicious.dll --profile injection",
+    "tags": ["pe", "imports", "static"],
+    "stars": 83
+  },
+  {
+    "name": "File Hasher",
+    "description": "Batch-computes MD5, SHA-1, SHA-256 and SHA-512 for files or directories with CSV export for IOC ingestion.",
+    "category": "hashing",
+    "language": "python",
+    "scriptPath": "/scripts/file_hasher.py",
+    "usage": "python file_hasher.py ./samples --csv hashes.csv",
+    "tags": ["hashing", "sha256", "batch"],
+    "stars": 176
+  },
+  {
+    "name": "IOC Extractor",
+    "description": "Pulls IPv4 addresses, domains, URLs and hashes out of any text — reports, chat logs, sandbox output — with defanged output.",
+    "category": "hashing",
+    "language": "python",
+    "scriptPath": "/scripts/ioc_extractor.py",
+    "usage": "python ioc_extractor.py notes.txt --defang",
+    "tags": ["ioc", "parsing", "automation"],
+    "stars": 154
+  },
+  {
+    "name": "Hash Strength Checker",
+    "description": "Educational estimator: shows collision resistance, truncation risk and why MD5/SHA-1 must never be used for integrity.",
+    "category": "hashing",
+    "language": "python",
+    "scriptPath": "",
+    "usage": "python hash_strength.py --compare md5 sha1 sha256",
+    "tags": ["education", "crypto", "hashing"],
+    "stars": 47
+  }
+]

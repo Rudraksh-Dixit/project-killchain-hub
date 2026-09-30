@@ -1,0 +1,178 @@
+[
+  {
+    "title": "Encoded PowerShell Command Line",
+    "description": "Detects PowerShell launched with Base64 encoded commands, hidden windows or no-profile flags — a staple of initial execution and loader staging.",
+    "language": "kql",
+    "difficulty": "beginner",
+    "tactics": ["Execution"],
+    "techniques": ["T1059.001"],
+    "tags": ["powershell", "command-line", "windows", "encoding"],
+    "author": "PKC Research",
+    "query": "// Defender for Endpoint / Sentinel\nDeviceProcessEvents\n| where Timestamp > ago(7d)\n| where FileName in~ (\"powershell.exe\", \"pwsh.exe\")\n| where ProcessCommandLine has_any (\"-EncodedCommand\", \"-enc \", \"-e \", \"FromBase64String\", \"-nop\", \"-w hidden\", \"-windowstyle hidden\")\n| project Timestamp, AccountName, DeviceName, FileName, ProcessCommandLine, InitiatingProcessFileName, InitiatingProcessCommandLine\n| order by Timestamp desc"
+  },
+  {
+    "title": "New Scheduled Task Registration",
+    "description": "Finds non-Microsoft scheduled tasks created via Event 4698. Review the task action binary path and creator account.",
+    "language": "spl",
+    "difficulty": "beginner",
+    "tactics": ["Persistence", "Privilege Escalation"],
+    "techniques": ["T1053.005"],
+    "tags": ["windows", "persistence", "scheduled-task"],
+    "author": "PKC Research",
+    "query": "index=wineventlog sourcetype=WinEventLog:Security EventCode=4698\n| table _time, Computer, SubjectUserName, TaskName, TaskContent\n| where NOT like(TaskName, \"%\\\\Microsoft\\\\Windows\\\\%\")\n| rex field=TaskContent \"<Command>(?<action>[^<]+)</Command>\"\n| stats count as creations, values(action) as actions, values(SubjectUserName) as creators by Computer, TaskName\n| where count > 0\n| sort - creations"
+  },
+  {
+    "title": "Rare Parent-Child Process Pair",
+    "description": "Surfaces parent/child process relationships that occur in fewer than 0.5% of hosts — a strong signal for LOLBin abuse and shell spawning.",
+    "language": "kql",
+    "difficulty": "intermediate",
+    "tactics": ["Defense Evasion", "Execution"],
+    "techniques": ["T1036", "T1218"],
+    "tags": ["process-tree", "anomaly", "lolbin"],
+    "author": "PKC Research",
+    "query": "// Requires >= 14 days of EndpointEvents baseline\nlet baseline = DeviceProcessEvents\n| where Timestamp > ago(14d) and Timestamp < ago(1d)\n| summarize pair_count = count() by InitiatingProcessFileName, FileName;\nDeviceProcessEvents\n| where Timestamp > ago(1d)\n| join kind=leftanti baseline on InitiatingProcessFileName, FileName\n| summarize events = count(), devices = dcount(DeviceName) by InitiatingProcessFileName, FileName\n| where devices <= 3\n| sort by events desc"
+  },
+  {
+    "title": "Outbound Beaconing to Rare Domains",
+    "description": "Classic beacon detection: low jitter, regular intervals and destinations rarely seen in the environment.",
+    "language": "spl",
+    "difficulty": "advanced",
+    "tactics": ["Command and Control"],
+    "techniques": ["T1071.001"],
+    "tags": ["c2", "beaconing", "network"],
+    "author": "PKC Research",
+    "query": "index=proxy status=200\n| where isnotnull(dest_domain)\n| bin _time span=5m\n| stats count as hits, dc(dest_domain) as dests by src_ip, dest_domain\n| join type=left [search index=proxy earliest=-30d latest=-1d\n  | stats dc(_time) as observed_windows by src_ip, dest_domain\n  | where observed_windows < 5]\n| eval regularity = round(hits / 1.0, 2)\n| where hits >= 12 and dests <= 2\n| sort - hits"
+  },
+  {
+    "title": "LSASS Handle Access from Unsigned Binary",
+    "description": "Sigma-style rule catching credential dumpers opening LSASS with PROCESS_VM_READ from anything other than a signed Microsoft binary.",
+    "language": "sigma",
+    "difficulty": "intermediate",
+    "tactics": ["Credential Access"],
+    "techniques": ["T1003.001"],
+    "tags": ["sigma", "credential-access", "lsass", "sysmon"],
+    "author": "PKC Research",
+    "query": "title: Suspicious LSASS Handle Access\nid: 7f2c1f4e-6c1a-4a51-9d3b-0f4b6d2a1c99\ndescription: Detects non-Microsoft processes requesting read access to LSASS memory\nstatus: experimental\nreferences:\n  - https://attack.mitre.org/techniques/T1003/001/\nauthor: Project KillChain Hub\ndate: 2026-01-15\nlogsource:\n  category: process_access\n  product: windows\ndetection:\n  selection:\n    TargetImage|endswith: '\\\\lsass.exe'\n    GrantedAccess|contains:\n      - '0x1010'\n      - '0x1410'\n  filter:\n    SourceImage|startswith:\n      - 'C:\\\\Windows\\\\System32\\\\'\n      - 'C:\\\\Program Files\\\\Windows Defender\\\\'\n  condition: selection and not filter\nfalsepositives:\n  - Legitimate EDR and debugging tooling\nlevel: high\ntags:\n  - attack.credential_access"
+  },
+  {
+    "title": "Office Application Spawned a Shell",
+    "description": "Word, Excel or PowerPoint launching cmd/powershell/mshta — the classic malicious document execution path.",
+    "language": "kql",
+    "difficulty": "beginner",
+    "tactics": ["Execution", "Initial Access"],
+    "techniques": ["T1204.002", "T1059.003"],
+    "tags": ["office", "macro", "initial-access"],
+    "author": "PKC Research",
+    "query": "DeviceProcessEvents\n| where Timestamp > ago(7d)\n| where InitiatingProcessFileName in~ (\"WINWORD.EXE\", \"EXCEL.EXE\", \"POWERPNT.EXE\", \"OUTLOOK.EXE\", \"MSACCESS.EXE\")\n| where FileName in~ (\"cmd.exe\", \"powershell.exe\", \"pwsh.exe\", \"mshta.exe\", \"wscript.exe\", \"cscript.exe\", \"rundll32.exe\", \"regsvr32.exe\")\n| project Timestamp, DeviceName, AccountName, InitiatingProcessFileName, InitiatingProcessCommandLine, FileName, ProcessCommandLine\n| order by Timestamp desc"
+  },
+  {
+    "title": "MFA Push Fatigue (Repeated Denials)",
+    "description": "Flags accounts receiving a burst of denied MFA pushes — the tell-tale sign of push-bombing social engineering.",
+    "language": "kql",
+    "difficulty": "beginner",
+    "tactics": ["Initial Access"],
+    "techniques": ["T1621"],
+    "tags": ["identity", "entra", "mfa", "phishing"],
+    "author": "PKC Research",
+    "query": "// Microsoft Entra ID sign-in logs\nSigninLogs\n| where TimeGenerated > ago(7d)\n| where ResultType in (\"50126\", \"50074\", \"50076\", \"50079\")\n| summarize pushes = count(),\n              first_denial = min(TimeGenerated),\n              last_denial = max(TimeGenerated),\n              apps = make_set(AppDisplayName, 10)\n        by UserPrincipalName, IPAddress\n| where pushes >= 5\n| extend interval_minutes = datetime_diff('minute', last_denial, first_denial)\n| where interval_minutes <= 30\n| sort by pushes desc"
+  },
+  {
+    "title": "DNS Tunnelling Heuristics",
+    "description": "Detects unusually long or high-entropy DNS queries indicative of data exfiltration over DNS.",
+    "language": "spl",
+    "difficulty": "advanced",
+    "tactics": ["Exfiltration", "Command and Control"],
+    "techniques": ["T1071.004", "T1048.003"],
+    "tags": ["dns", "exfiltration", "network"],
+    "author": "PKC Research",
+    "query": "index=dns\n| eval qname_len = len(query)\n| eval label_len = strlen(mvindex(split(query, \".\"), 0))\n| where qname_len > 60 or label_len > 40\n| stats avg(qname_len) as avg_len, max(qname_len) as max_len,\n        count as queries, dc(query) as unique_queries,\n        values(src) as sources\n        by dest, query\n| eval uniq_ratio = round(unique_queries / queries, 2)\n| where queries >= 10\n| sort - avg_len"
+  },
+  {
+    "title": "Microsoft Defender Real-Time Protection Disabled",
+    "description": "Sigma rule for tamper events where real-time monitoring, behavior monitoring or IOAV protection is switched off.",
+    "language": "sigma",
+    "difficulty": "beginner",
+    "tactics": ["Defense Evasion"],
+    "techniques": ["T1562.001"],
+    "tags": ["sigma", "defense-evasion", "defender"],
+    "author": "PKC Research",
+    "query": "title: Microsoft Defender Protection Disabled\nid: 3c9d1a72-88bb-4d5f-9a0e-2f6c7b54e118\ndescription: Detects events indicating Microsoft Defender real-time protection was disabled\nstatus: stable\nauthor: Project KillChain Hub\ndate: 2026-02-02\nlogsource:\n  product: windows\n  service: mdefender\ndetection:\n  selection:\n    EventID:\n      - 5001\n      - 1116\n      - 1006\n    Keyword|contains:\n      - 'RTP disabled'\n      - 'real-time protection'\n  condition: selection\nfalsepositives:\n  - Planned administrative changes\nlevel: medium\ntags:\n  - attack.defense_evasion"
+  },
+  {
+    "title": "Anomalous RDP Logons Between Workstations",
+    "description": "Workstation-to-workstation RDP logons are rare in most environments and common in lateral movement.",
+    "language": "spl",
+    "difficulty": "intermediate",
+    "tactics": ["Lateral Movement"],
+    "techniques": ["T1021.001"],
+    "tags": ["rdp", "lateral-movement", "windows"],
+    "author": "PKC Research",
+    "query": "index=wineventlog sourcetype=WinEventLog:Security (EventCode=4624 OR EventCode=4778) Logon_Type=10\n| stats count as sessions, values(TargetUserName) as accounts by src, dest\n| where NOT like(src, \"10.%\") OR NOT like(dest, \"10.%\")\n| join type=left [search index=cmdb sourcetype=asset\n  | eval is_workstation = if(itype=\"workstation\", 1, 0)\n  | table host, is_workstation]\n| where is_workstation=1\n| sort - sessions"
+  },
+  {
+    "title": "Fake Browser Update Lure (YARA)",
+    "description": "YARA rule for the injected script pattern used by fake-update (ClickFix style) landing pages served from hijacked WordPress sites.",
+    "language": "yara",
+    "difficulty": "intermediate",
+    "tactics": ["Initial Access"],
+    "techniques": ["T1189"],
+    "tags": ["yara", "phishing", "fake-update", "web"],
+    "author": "PKC Research",
+    "query": "rule Fake_Update_Lure_Script\n{\n  meta:\n    description = \"Fake browser update / ClickFix landing page script\"\n    author = \"Project KillChain Hub\"\n    date = \"2026-03-01\"\n    reference = \"educational-defensive-rule\"\n  strings:\n    $a = \"Your browser is out of date\" ascii nocase\n    $b = \"Press Win + R\" ascii nocase\n    $c = \"update.js?build=\" ascii nocase\n    $d = \"document.execCommand('copy')\" ascii nocase\n    $e = \"chrome://settings\" ascii nocase\n  condition:\n    filesize < 512KB and 3 of ($*)\n}"
+  },
+  {
+    "title": "Mass File Rename Consistent with Ransomware",
+    "description": "Detects a single host renaming hundreds of files across user profiles in a short window — encryptor behaviour.",
+    "language": "kql",
+    "difficulty": "intermediate",
+    "tactics": ["Impact"],
+    "techniques": ["T1486"],
+    "tags": ["ransomware", "file-ops", "impact"],
+    "author": "PKC Research",
+    "query": "FileCreationEvents\n| where Timestamp > ago(1d)\n| where ActionType = \"FileRenamed\"\n| summarize renamed = count(),\n            extensions = make_set(RenameTargetFileExtension, 8),\n            folders = dcount(FolderPath)\n        by DeviceName, AccountName\n| where renamed >= 250 and folders >= 5\n| sort by renamed desc"
+  },
+  {
+    "title": "Service Installation via sc.exe or PowerShell",
+    "description": "New services are a durable persistence mechanism. This hunt isolates service installs created from user-writable paths.",
+    "language": "kql",
+    "difficulty": "beginner",
+    "tactics": ["Persistence", "Privilege Escalation"],
+    "techniques": ["T1543.003"],
+    "tags": ["services", "persistence", "windows"],
+    "author": "PKC Research",
+    "query": "DeviceProcessEvents\n| where Timestamp > ago(7d)\n| where (FileName in~ (\"sc.exe\", \"services.exe\") and ProcessCommandLine has \"create\")\n    or (FileName =~ \"powershell.exe\" and ProcessCommandLine has_any (\"New-Service\", \"sc.exe create\"))\n| extend bin = extract(@\"binPath(?:\\s*=\\s*|\\s+)(?<b>[^\\s]+)\", 1, ProcessCommandLine)\n| where isnotempty(bin) and (bin has \"\\\\Users\\\\\" or bin has \"\\\\Temp\\\\\" or bin has \"\\\\AppData\\\\\")\n| project Timestamp, DeviceName, AccountName, FileName, ProcessCommandLine, bin\n| order by Timestamp desc"
+  },
+  {
+    "title": "PowerShell Download Cradle",
+    "description": "Catches Invoke-WebRequest / Net.WebClient download patterns used to fetch second-stage payloads.",
+    "language": "powershell",
+    "difficulty": "beginner",
+    "tactics": ["Command and Control", "Execution"],
+    "techniques": ["T1105"],
+    "tags": ["powershell", "download", "c2"],
+    "author": "PKC Research",
+    "query": "# ArcSight / EDR hunting variant — iterate over host telemetry\n$pattern = 'Invoke-WebRequest|Invoke-RestMethod|Net\\.WebClient|DownloadFile|DownloadString|Start-BitsTransfer'\n$since = (Get-Date).AddDays(-7)\n\nGet-WinEvent -FilterHashtable @{ LogName = 'Microsoft-Windows-PowerShell/Operational'; StartTime = $since } |\n  Where-Object { $_.Message -match $pattern } |\n  ForEach-Object {\n    [pscustomobject]@{\n      Time     = $_.TimeCreated\n      Host     = $_.MachineName\n      Rule     = $_.Id\n      Evidence = ($_.Message -split \"`n\")[0..3] -join ' '\n    }\n  } | Sort-Object Time -Descending | Format-Table -AutoSize"
+  },
+  {
+    "title": "Kerberoasting: Unusual Service Ticket Requests",
+    "description": "Accounts requesting service tickets for many SPNs in a short window, especially from non-server accounts.",
+    "language": "spl",
+    "difficulty": "advanced",
+    "tactics": ["Credential Access"],
+    "techniques": ["T1558.003"],
+    "tags": ["kerberos", "active-directory", "credential-access"],
+    "author": "PKC Research",
+    "query": "index=wineventlog sourcetype=WinEventLog:Security EventCode=4769\n| where ServiceName NOT IN (\"krbtgt\", \"*\")\n| eval spn = ServiceName\n| stats count as tickets, dc(spn) as distinct_spns, values(spn) as spns by Account_Name, src\n| where tickets >= 10 and distinct_spns >= 5\n| join type=left [search index=cmdb sourcetype=asset | table host, role]\n| where role != \"domain_controller\"\n| sort - tickets"
+  },
+  {
+    "title": "Suspicious Child of Winword with Network Connection",
+    "description": "Chains process and network telemetry: documents that both spawn interpreters and open outbound connections.",
+    "language": "kql",
+    "difficulty": "advanced",
+    "tactics": ["Initial Access", "Command and Control"],
+    "techniques": ["T1204.002", "T1071.001"],
+    "tags": ["correlation", "office", "network"],
+    "author": "PKC Research",
+    "query": "let proc = DeviceProcessEvents\n| where Timestamp > ago(7d)\n| where InitiatingProcessFileName in~ (\"WINWORD.EXE\", \"EXCEL.EXE\", \"POWERPNT.EXE\")\n| project proc_time = Timestamp, DeviceName, child = FileName, child_cmd = ProcessCommandLine;\nlet net = DeviceNetworkEvents\n| where Timestamp > ago(7d)\n| where RemoteIPType = \"Public\" and ActionType = \"ConnectionAllowed\"\n| project net_time = Timestamp, DeviceName, RemoteIP, RemoteUrl, InitiatingProcessFileName;\nproc\n| join kind=inner net on DeviceName\n| where datetime_diff('minute', net_time, proc_time) between (0 .. 30)\n| summarize connections = make_set(RemoteUrl, 10), first_seen = min(proc_time) by DeviceName, child, child_cmd\n| sort by first_seen desc"
+  }
+]

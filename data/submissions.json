@@ -1,0 +1,73 @@
+[
+  {
+    "kind": "ioc",
+    "title": "Loader C2 on documentation range",
+    "body": "Observed during a purple-team exercise in the lab range. Sharing for the shared detection library.",
+    "submitter": "contributor",
+    "status": "pending",
+    "payload": {
+      "type": "ip",
+      "value": "203.0.113.77",
+      "malwareFamily": "Smoke Loader",
+      "category": "loader",
+      "severity": "medium",
+      "confidence": "medium",
+      "firstSeen": "2026-08-02T00:00:00.000Z",
+      "lastSeen": "2026-09-10T00:00:00.000Z",
+      "tags": ["lab-range", "c2", "loader-stage"],
+      "source": "Community Submission",
+      "description": "Fictional lab indicator: loader callback host used in an internal exercise."
+    }
+  },
+  {
+    "kind": "hunt",
+    "title": "Anomalous Service Principal Secret Usage",
+    "body": "Entra ID hunt for service principals authenticating from unexpected sources after secret rotation.",
+    "submitter": "viewer",
+    "status": "pending",
+    "payload": {
+      "title": "Anomalous Service Principal Secret Usage",
+      "description": "Detects service principal sign-ins from IP ranges outside the organisation's normal footprint.",
+      "language": "kql",
+      "difficulty": "advanced",
+      "tactics": ["Credential Access", "Defense Evasion"],
+      "techniques": ["T1528", "T1078.004"],
+      "tags": ["entra", "service-principal", "identity"],
+      "author": "viewer",
+      "query": "ServicePrincipalSignInLogs\n| where TimeGenerated > ago(7d)\n| summarize count(), dcount(IPAddress), make_set(IPAddress, 10) by AppDisplayName, AppId\n| where dcount_IPAddress >= 4"
+    }
+  },
+  {
+    "kind": "resource",
+    "title": "Detection Engineering Reading List",
+    "body": "Curated papers and blogs for engineers writing detections as code.",
+    "submitter": "contributor",
+    "status": "pending",
+    "payload": {
+      "name": "Detection Engineering Reading List",
+      "description": "A short, opinionated set of essays on detection lifecycle, testing and tuning.",
+      "category": "analyst-tools",
+      "url": "https://example.org/detection-reading-list",
+      "tags": ["reading", "detection-eng"]
+    }
+  },
+  {
+    "kind": "tool",
+    "title": "Sysmon Config Diff",
+    "body": "Compares two Sysmon configurations and highlights dropped or weakened rules. Needs a maintainer review for style.",
+    "submitter": "viewer",
+    "status": "rejected",
+    "reviewer": "admin",
+    "reviewNote": "Duplicate of an existing script in the Windows category — please extend the existing tool instead.",
+    "payload": {
+      "name": "Sysmon Config Diff",
+      "description": "Diffs two Sysmon XML configurations and flags removed detections.",
+      "category": "windows",
+      "language": "powershell",
+      "scriptPath": "",
+      "usage": ".\\sysmon-diff.ps1 -Old old.xml -New new.xml",
+      "tags": ["sysmon", "config"],
+      "stars": 12
+    }
+  }
+]

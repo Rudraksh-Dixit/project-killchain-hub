@@ -1,0 +1,17 @@
+.git
+.github
+node_modules
+**/node_modules
+dist
+**/dist
+coverage
+**/coverage
+temp
+*.log
+*.db
+*.db-journal
+*.sqlite*
+.env
+.env.local
+data/*.db
+data/*.db-*

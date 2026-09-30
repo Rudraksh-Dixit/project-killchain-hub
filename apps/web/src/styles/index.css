@@ -1,0 +1,397 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ────────────────────────────────────────────────────────────────
+   Design tokens — dark is the default theme, `html.light` overrides.
+   Colors are stored as R G B triplets so Tailwind can apply alpha.
+   Spacing follows an 8px grid; motion uses 150–250ms + smooth ease.
+   ──────────────────────────────────────────────────────────────── */
+
+:root {
+  color-scheme: dark;
+
+  /* surfaces */
+  --c-bg: 10 12 18;
+  --c-surface: 15 18 26;
+  --c-surface-2: 21 25 35;
+  --c-surface-3: 29 34 46;
+  --c-border: 35 41 55;
+  --c-border-strong: 52 60 79;
+
+  /* text */
+  --c-text: 232 236 244;
+  --c-text-2: 160 169 188;
+  --c-text-3: 112 122 141;
+
+  /* one confident accent */
+  --c-accent: 110 123 255;
+  --c-accent-hover: 137 148 255;
+  --c-accent-soft: 110 123 255;
+  --c-accent-contrast: 255 255 255;
+
+  /* semantic severity */
+  --sev-critical: 240 67 91;
+  --sev-high: 255 122 69;
+  --sev-medium: 245 181 68;
+  --sev-low: 79 163 247;
+  --sev-info: 138 148 168;
+
+  /* status */
+  --c-success: 63 185 140;
+  --c-warning: 245 181 68;
+  --c-danger: 240 67 91;
+
+  /* elevation */
+  --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.28);
+  --shadow-pop: 0 12px 28px -8px rgb(0 0 0 / 0.55), 0 2px 8px -2px rgb(0 0 0 / 0.4);
+  --shadow-overlay: 0 28px 70px -18px rgb(0 0 0 / 0.7);
+
+  /* syntax tokens */
+  --tok-comment: 106 116 136;
+  --tok-string: 122 203 164;
+  --tok-number: 240 196 110;
+  --tok-keyword: 150 160 255;
+  --tok-func: 122 176 255;
+}
+
+html.light {
+  color-scheme: light;
+
+  --c-bg: 246 247 250;
+  --c-surface: 255 255 255;
+  --c-surface-2: 243 245 249;
+  --c-surface-3: 235 238 244;
+  --c-border: 226 230 238;
+  --c-border-strong: 195 203 218;
+
+  --c-text: 16 20 28;
+  --c-text-2: 72 81 99;
+  --c-text-3: 116 126 147;
+
+  --c-accent: 74 86 219;
+  --c-accent-hover: 58 70 204;
+  --c-accent-soft: 74 86 219;
+  --c-accent-contrast: 255 255 255;
+
+  --sev-critical: 214 38 66;
+  --sev-high: 214 86 26;
+  --sev-medium: 171 117 6;
+  --sev-low: 32 116 214;
+  --sev-info: 92 103 128;
+
+  --c-success: 18 141 102;
+  --c-warning: 171 117 6;
+  --c-danger: 214 38 66;
+
+  --shadow-card: 0 1px 2px 0 rgb(16 24 40 / 0.06);
+  --shadow-pop: 0 14px 28px -10px rgb(16 24 40 / 0.16), 0 2px 6px -2px rgb(16 24 40 / 0.08);
+  --shadow-overlay: 0 28px 64px -18px rgb(16 24 40 / 0.26);
+
+  --tok-comment: 128 138 160;
+  --tok-string: 20 128 88;
+  --tok-number: 160 110 8;
+  --tok-keyword: 74 86 219;
+  --tok-func: 32 104 200;
+}
+
+/* ── base ─────────────────────────────────────────────────────── */
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scrollbar-color: rgb(var(--c-border-strong)) transparent;
+  }
+
+  body {
+    @apply bg-bg font-sans text-sm text-ink antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: rgb(var(--c-accent) / 0.32);
+    color: rgb(var(--c-text));
+  }
+
+  *:focus {
+    outline: none;
+  }
+
+  *:focus-visible {
+    outline: 2px solid rgb(var(--c-accent));
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgb(var(--c-border-strong) / 0.7);
+    border: 3px solid transparent;
+    background-clip: content-box;
+    border-radius: 999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(var(--c-border-strong));
+    background-clip: content-box;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display font-semibold tracking-tight text-ink;
+  }
+
+  input,
+  textarea,
+  select {
+    font-family: inherit;
+  }
+}
+
+/* ── components ───────────────────────────────────────────────── */
+
+@layer components {
+  .pkc-card {
+    @apply rounded-lg border border-line bg-surface shadow-card;
+  }
+
+  .pkc-input {
+    @apply w-full rounded-md border border-line bg-surface2 px-3 py-2 text-sm text-ink
+      placeholder:text-ink-3 transition-colors duration-150 ease-smooth
+      hover:border-line-strong focus:border-accent focus:bg-surface
+      focus:outline-none focus:ring-2 focus:ring-accent/25;
+  }
+
+  .pkc-select {
+    @apply pkc-input appearance-none bg-no-repeat pr-9;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%237b849b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-position: right 10px center;
+  }
+
+  .pkc-grid-bg {
+    background-image:
+      linear-gradient(rgb(var(--c-border) / 0.55) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(var(--c-border) / 0.55) 1px, transparent 1px);
+    background-size: 34px 34px;
+    -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000 0%, transparent 80%);
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000 0%, transparent 80%);
+  }
+
+  .pkc-hairline {
+    @apply border-line;
+  }
+
+  .pkc-skeleton {
+    @apply relative overflow-hidden rounded-md bg-surface2;
+  }
+
+  .pkc-skeleton::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgb(var(--c-text-3) / 0.09) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.6s linear infinite;
+  }
+}
+
+/* ── syntax highlighting tokens ───────────────────────────────── */
+
+.tok-comment {
+  color: rgb(var(--tok-comment));
+  font-style: italic;
+}
+.tok-string {
+  color: rgb(var(--tok-string));
+}
+.tok-number {
+  color: rgb(var(--tok-number));
+}
+.tok-keyword {
+  color: rgb(var(--tok-keyword));
+  font-weight: 500;
+}
+.tok-func {
+  color: rgb(var(--tok-func));
+}
+
+/* ── markdown prose ───────────────────────────────────────────── */
+
+.pkc-prose {
+  @apply text-[15px] leading-7 text-ink-2;
+}
+
+.pkc-prose > * + * {
+  margin-top: 1rem;
+}
+
+.pkc-prose h1,
+.pkc-prose h2,
+.pkc-prose h3,
+.pkc-prose h4 {
+  @apply mt-10 mb-3 text-ink scroll-mt-24;
+  line-height: 1.25;
+}
+
+.pkc-prose h1 {
+  @apply text-3xl;
+}
+.pkc-prose h2 {
+  @apply text-2xl border-b border-line pb-2;
+}
+.pkc-prose h3 {
+  @apply text-lg;
+}
+.pkc-prose h4 {
+  @apply text-base;
+}
+
+.pkc-prose p {
+  @apply my-4;
+}
+
+.pkc-prose strong {
+  @apply font-semibold text-ink;
+}
+
+.pkc-prose a {
+  @apply text-accent underline decoration-accent/40 underline-offset-2 transition-colors hover:decoration-accent;
+}
+
+.pkc-prose ul,
+.pkc-prose ol {
+  @apply my-4 pl-6;
+}
+
+.pkc-prose ul {
+  list-style: disc;
+}
+
+.pkc-prose ol {
+  list-style: decimal;
+}
+
+.pkc-prose li {
+  @apply my-1.5;
+}
+
+.pkc-prose li::marker {
+  color: rgb(var(--c-text-3));
+}
+
+.pkc-prose code {
+  @apply rounded bg-surface2 px-1.5 py-0.5 font-mono text-[13px] text-ink;
+}
+
+.pkc-prose pre {
+  @apply my-5 overflow-x-auto rounded-lg border border-line bg-surface2 p-4;
+}
+
+.pkc-prose pre code {
+  @apply bg-transparent p-0 text-[12.5px] leading-6;
+}
+
+.pkc-prose blockquote {
+  @apply my-5 border-l-2 border-accent/60 bg-surface2/60 py-2 pl-4 pr-3 text-ink-2 italic;
+}
+
+.pkc-prose hr {
+  @apply my-8 border-line;
+}
+
+.pkc-prose table {
+  @apply my-5 w-full overflow-hidden rounded-lg border border-line text-left text-sm;
+  border-collapse: collapse;
+}
+
+.pkc-prose th {
+  @apply border-b border-line bg-surface2 px-3 py-2 font-semibold text-ink;
+}
+
+.pkc-prose td {
+  @apply border-b border-line px-3 py-2 align-top;
+}
+
+.pkc-prose tr:last-child td {
+  @apply border-b-0;
+}
+
+/* ── motion ───────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── print / PDF export ───────────────────────────────────────── */
+
+@media print {
+  :root {
+    --c-bg: 255 255 255;
+    --c-surface: 255 255 255;
+    --c-surface-2: 246 247 250;
+    --c-surface-3: 240 242 246;
+    --c-border: 226 230 238;
+    --c-border-strong: 180 188 204;
+    --c-text: 16 20 28;
+    --c-text-2: 55 63 80;
+    --c-text-3: 100 110 130;
+    --shadow-card: none;
+    --shadow-pop: none;
+    --shadow-overlay: none;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: #fff !important;
+    color: #10141c;
+  }
+
+  .pkc-print-page {
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    max-width: none !important;
+    margin: 0 !important;
+  }
+
+  .pkc-prose,
+  .pkc-prose pre {
+    break-inside: avoid;
+  }
+
+  h1,
+  h2,
+  h3 {
+    break-after: avoid;
+  }
+
+  @page {
+    margin: 16mm;
+  }
+}

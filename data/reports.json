@@ -1,0 +1,92 @@
+[
+  {
+    "title": "External Web Application Assessment — Northwind Analytics",
+    "client": "Northwind Analytics (fictional)",
+    "status": "in-review",
+    "scope": "Public-facing web application and supporting API at https://portal.example.com and https://api.example.com. Social engineering and physical testing explicitly out of scope.",
+    "executiveSummary": "The assessment identified two high-severity issues in the authentication layer and one medium-severity information disclosure. No evidence of compromise was found in the provided logs. Remediation of the session handling findings should be prioritised before the next release.",
+    "methodology": "Testing followed the OWASP Testing Guide v4 with manual verification of every automated finding. The engagement combined authenticated and unauthenticated testing across web and API surfaces over five working days.",
+    "findings": [
+      {
+        "id": "f-001",
+        "title": "Session cookie missing HttpOnly and SameSite attributes",
+        "severity": "high",
+        "cvss": 8.1,
+        "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N",
+        "cwe": "CWE-1004",
+        "status": "open",
+        "affected": "portal.example.com",
+        "description": "The session cookie is issued without the HttpOnly or SameSite attributes, allowing scripted access to the session token from a cross-site scripting context and lowering the bar for CSRF.",
+        "evidence": "Set-Cookie: sid=8f3c2a...; Path=/; Secure\n\n# missing: HttpOnly, SameSite=Strict (or Lax)",
+        "remediation": "Set HttpOnly and SameSite=Lax (Strict where compatibility allows) on all session cookies, and re-issue active sessions after the change.",
+        "references": ["https://owasp.org/www-community/controls/HttpOnly", "https://developer.mozilla-en-US/docs/Web/HTTP/Headers/Set-Cookie"]
+      },
+      {
+        "id": "f-002",
+        "title": "Broken object level authorisation on export endpoint",
+        "severity": "high",
+        "cvss": 7.7,
+        "vector": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N",
+        "cwe": "CWE-639",
+        "status": "partial",
+        "affected": "api.example.com /v1/reports/{id}",
+        "description": "An authenticated low-privilege user can retrieve report objects belonging to another tenant by incrementing the identifier.",
+        "evidence": "GET /v1/reports/1042 HTTP/1.1\nCookie: sid=<low-priv>\n\nHTTP/1.1 200 OK\n{ \"client\": \"Another Customer Ltd\", ... }",
+        "remediation": "Enforce server-side object ownership checks on every read/write path and add regression tests for cross-tenant identifiers.",
+        "references": ["https://owasp.org/API-Security/editions/2023/en/0xa1-broken-object-level-authorization/"]
+      },
+      {
+        "id": "f-003",
+        "title": "Verbose error message discloses internal stack trace",
+        "severity": "medium",
+        "cvss": 5.3,
+        "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+        "cwe": "CWE-209",
+        "status": "remediated",
+        "affected": "api.example.com",
+        "description": "Unhandled exceptions return a full stack trace including framework versions to unauthenticated callers.",
+        "evidence": "HTTP/1.1 500 Internal Server Error\n{ \"exception\": \"com.example.svc.ReportSvc\", \"version\": \"3.4.1-SNAPSHOT\" }",
+        "remediation": "Return a generic error body with a correlation ID; log full detail server-side only. Confirmed fixed in build 3.4.2.",
+        "references": []
+      }
+    ]
+  },
+  {
+    "title": "Internal Network Segmentation Review — Harbourline Logistics",
+    "client": "Harbourline Logistics (fictional)",
+    "status": "draft",
+    "scope": "Assumed-compromise review of segmentation between the corporate LAN, warehouse floor and OT-adjacent VLANs.",
+    "executiveSummary": "Initial scoping complete. Two hypotheses are being tested: east-west traffic from the corporate VLAN into warehouse terminals, and flat access from guest Wi-Fi to file services. Fieldwork begins next sprint.",
+    "methodology": "Document review, firewall rule analysis, controlled reachability testing from four pivot points and validation of alerting coverage for the tested paths.",
+    "findings": [
+      {
+        "id": "f-001",
+        "title": "Guest Wi-Fi has unrestricted access to file server SMB",
+        "severity": "critical",
+        "cvss": 9.1,
+        "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N",
+        "cwe": "CWE-923",
+        "status": "open",
+        "affected": "VLAN 40 → 10.20.30.0/24",
+        "description": "The guest wireless network can reach TCP/445 on internal file servers, exposing SMB services to unauthenticated visitors.",
+        "evidence": "nmap -Pn -p445,139 --open 10.20.30.10\nPORT    STATE SERVICE\n445/tcp open  microsoft-ds",
+        "remediation": "Block guest VLAN to internal RFC1918 ranges at the distribution layer and migrate SMB access behind an authenticated gateway.",
+        "references": []
+      },
+      {
+        "id": "f-002",
+        "title": "No east-west flow logging between warehouse VLANs",
+        "severity": "medium",
+        "cvss": 4.0,
+        "vector": "CVSS:3.1/AV:A/AC:L/PR:H/UI:N/S:U/C:L/I:N/A:N",
+        "cwe": "CWE-778",
+        "status": "open",
+        "affected": "Inter-VLAN firewall",
+        "description": "Inter-VLAN traffic is permitted but not logged, leaving lateral movement undetectable after the fact.",
+        "evidence": "policy: ALLOW any:any vlan41 -> vlan42 (log disabled)",
+        "remediation": "Enable session logging with 90-day retention for all inter-VLAN rules and stream to the SIEM.",
+        "references": []
+      }
+    ]
+  }
+]

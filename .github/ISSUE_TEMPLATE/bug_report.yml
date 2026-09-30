@@ -1,0 +1,38 @@
+name: Bug report
+description: Something in KillChain Hub is broken
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Clear description of the bug, including expected vs. actual behavior.
+      placeholder: Expected the severity facet to update, but the table kept the old rows…
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: Minimal steps, starting from `npm run dev`.
+      render: bash
+      placeholder: |
+        1. npm run seed && npm run dev
+        2. Open /iocs, filter severity=critical
+        3. …
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Environment
+      placeholder: "Windows 11 · Node 20.11 · Chrome 130"
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / console output
+      render: shell
+
+# Never paste real indicator data — this project ships synthetic content only.

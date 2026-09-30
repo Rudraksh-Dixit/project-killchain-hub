@@ -1,0 +1,84 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  node:
+    name: Lint · typecheck · test · build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test (api + web)
+        run: npm test
+
+      - name: Seed database (smoke)
+        run: npm run seed
+
+      - name: Build
+        run: npm run build
+
+      - name: API health smoke
+        run: |
+          node apps/api/dist/index.js &
+          API_PID=$!
+          for i in $(seq 1 30); do
+            curl -fsS http://localhost:4000/api/health >/dev/null 2>&1 && break
+            sleep 1
+          done
+          curl -fsS http://localhost:4000/api/health
+          kill $API_PID
+
+  scripts:
+    name: Python tooling round-trip
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Fixture feed
+        run: |
+          cat > /tmp/feed.csv <<'EOF'
+          type,value,malware_family,category,severity,confidence,first_seen,last_seen,tags,source,description
+          ip,192.0.2.44,TestWare,network,critical,high,2026-01-02,2026-01-03,lab;demo,fixture,Documentation range
+          domain,telemetry.example.org,TestWare,network,high,medium,2026-01-02,2026-01-03,lab,fixture,RFC 2606 domain
+          hash,44d88612fea8a8f36de82e1278abb02f,TestWare,network,medium,medium,2026-01-02,2026-01-03,,fixture,Fabricated MD5
+          url,https://portal.example.com/login,TestWare,phishing,medium,medium,2026-01-02,2026-01-03,phish,fixture,Synthetic URL
+          EOF
+
+      - name: Normalize (strict)
+        run: python scripts/normalize_iocs.py /tmp/feed.csv -o /tmp/clean.csv --strict
+
+      - name: STIX round-trip
+        run: |
+          python scripts/to_stix.py /tmp/clean.csv -o /tmp/bundle.json
+          python scripts/stix_to_ioc.py /tmp/bundle.json -o /tmp/back.csv
+          python scripts/ioc_stats.py /tmp/back.csv -o /tmp/report.md
+          grep -q "By type" /tmp/report.md
+
+      - name: Compile all scripts
+        run: python -m py_compile scripts/*.py

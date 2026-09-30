@@ -1,0 +1,39 @@
+{
+  "name": "project-killchain-hub",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Project KillChain Hub — open-source cybersecurity knowledge and IOC platform for Red Team and Blue Team practitioners.",
+  "license": "MIT",
+  "author": "CyDefOps",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Rudraksh-Dixit/project-killchain-hub"
+  },
+  "workspaces": [
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "concurrently -k -n api,web -c cyan,magenta \"npm run dev -w @pkc/api\" \"npm run dev -w @pkc/web\"",
+    "build": "npm run build -w @pkc/api && npm run build -w @pkc/web",
+    "start": "npm run start -w @pkc/api",
+    "seed": "npm run seed -w @pkc/api",
+    "test": "npm run test -w @pkc/api && npm run test -w @pkc/web",
+    "typecheck": "npm run typecheck -w @pkc/api && npm run typecheck -w @pkc/web",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"**/*.{ts,tsx,js,mjs,cjs,json,css,md,yml,yaml}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,mjs,cjs,json,css,md,yml,yaml}\""
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.0",
+    "concurrently": "^10.0.5",
+    "eslint": "^9.39.0",
+    "globals": "^17.12.0",
+    "prettier": "^3.9.9",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.71.0"
+  }
+}

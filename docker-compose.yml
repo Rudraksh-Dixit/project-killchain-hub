@@ -1,0 +1,33 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    environment:
+      NODE_ENV: production
+      PORT: "4000"
+      # Override in production: JWT_SECRET=$(openssl rand -hex 32)
+      JWT_SECRET: ${JWT_SECRET:-pkc-compose-dev-secret-change-me}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      # Browser origin serving the SPA (see the web service below)
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:8081}
+      DB_PATH: /app/data/killchain.db
+    ports:
+      - "4000:4000" # optional direct API access; the web proxy works regardless
+    volumes:
+      - pkc-data:/app/data
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    ports:
+      - "8081:80"
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  pkc-data:
